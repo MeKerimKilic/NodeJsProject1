@@ -1,5 +1,4 @@
 import express from "express";
-import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import User from "../Models/User.js";
 
@@ -12,9 +11,9 @@ router.post('/signup',async (req,res)=>{
         const userEmailExists= await User.finOne({email})
         const userPhoneExists= await User.finOne({phoneNumber})
         const userUsernameExists= await User.finOne({username})
-        if(userEmailExists || userPhoneExists || userEmailExists)
+        if(userEmailExists || userPhoneExists || userEmailExists || userUsernameExists)
             return res.status(400).json({
-                status:'error',
+                status:false,
                 code:100,
                 message:'User informatrion Phone or Email or Username is already'
             })
@@ -28,13 +27,16 @@ router.post('/signup',async (req,res)=>{
             password:hashedPassword
         })
 
-        return res.status(201).json(userCreated);
+        return res.status(201).json({
+            status:true,
+            userCreated
+        });
 
 
     }catch (error){
         console.log('Router: Usersignup Error:'+error);
         return res.status(400).json({
-            status:'error',
+            status:false,
             code:100,
             message:error
         })
@@ -44,8 +46,17 @@ router.post('/signup',async (req,res)=>{
 
 router.post('/signin', async (req,res)=>{
     try {
+        const {username, password}=req.body;
+        const user = await User.findOne({username});
+        if(!user)
+            return res.status(400).json({status:false,message:'User does not exist'})
+        const isPasswordCorrect= await bcrypt(password,user.password)
+        if(!isPasswordCorrect)
+            return res.status(400).json({status:false,message:'Wrong password'})
 
+        return res.status(200).json({status:true,message:'Authentication successful'})
     }catch (error){
-
+        console.log('Router: Usersignin Error:'+error);
+        return res.status(400).json({status:false,message:error})
     }
 })
