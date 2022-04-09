@@ -1,7 +1,10 @@
 import React from "react";
+import {getUser} from "../axios";
 
-const HomeScreen = () =>{
-    return (<div>Home</div>);
+const Home = (user) =>{
+   getUser('mekerimkilic').then((res) =>console.log(res.data));
+
+    return (<div>{user?.email}</div>);
 }
 
-export default HomeScreen;
+export default Home;

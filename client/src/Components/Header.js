@@ -1,8 +1,14 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {Navbar, Nav, Container,Button,NavDropdown} from "react-bootstrap";
 import {Link} from "react-router-dom";
 
-const Header = () =>{
+const Header = ({user, setUser}) =>{
+    useEffect(()=>{
+        if(localStorage.getItem('user') && !user){
+            setUser(JSON.parse(localStorage.getItem('user')))
+        }
+    },[user]);
+
     return(
         <Navbar className='py-4' bg="primary" expand='lg'>
             <Container>
@@ -28,11 +34,26 @@ const Header = () =>{
                         <Nav.Link href="#link" className='text-white'>İletişim</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
-                <Button variant='outline-light'>
-                    <Link
-                        className='text-white text-decoration-none'
-                    to='/auth'>Giriş Yap</Link>
-                </Button>
+                {
+                    user ? (
+                        <Button
+                            variant="outline-light"
+                            onClick={(e)=>{
+                            localStorage.removeItem('user');
+                            setUser(null);
+                        }}>
+                        {" "}
+                        Cıkış Yap
+                        {" "}
+                        </Button>
+                    ):(
+                    <Button variant='outline-light'>
+                        <Link
+                            className='text-white text-decoration-none'
+                            to='/auth/signin'>Giriş Yap</Link>
+                    </Button>)
+                }
+
             </Container>
         </Navbar>
     )

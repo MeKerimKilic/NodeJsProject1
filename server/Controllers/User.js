@@ -1,4 +1,4 @@
-import bcrypt from "bcryptjs";
+import bcrypt from 'bcryptjs'
 import UserModel from "../Models/User.js";
 
 export default new class {
@@ -53,15 +53,22 @@ export default new class {
             if(!user)
                 return res.status(400).json({status:false,message:'User does not exist'})
 
-            const isPasswordCorrect= await bcrypt(password,user.password)
+            const isPasswordCorrect= await bcrypt.compare(password,user.password)
             if(!isPasswordCorrect)
                 return res.status(400).json({status:false,message:'Wrong password'})
 
-            return res.status(200).json({status:true,message:'Authentication successful'})
+            return res.status(200).json({status:true,message:'Authentication successful',user})
         }catch (error){
             console.log('Router: Usersignin Error:'+error);
             return res.status(400).json({status:false,message:error})
         }
+    }
+
+    async userList(req,res){
+        const {username}=req.query;
+
+        const users = await UserModel.findOne({ username});
+        return res.status(200).json({status:true,users});
     }
 
 }
